@@ -12,6 +12,7 @@ To use this script pass it into o3de.bat's export-project command:
 <path-to-o3de-engine>\scripts\o3de.bat export-project -es <path-to-multiplayer-sample>\MPSGameLift\Scripts\export_gamelift_server_package.py -ll INFO
 """
 
+
 import os
 import argparse
 
@@ -59,13 +60,13 @@ while not args.generator:
         args.generator = "Visual Studio 17"
     elif user_input.lower() == 'q':
         quit()
-        
+
 build_folder = os.path.join(o3de_context.project_path, "build", "windows")
 
 # Build code
-if (args.code):
+if args.code:
     # Enable GameLift gems
-    o3de_logger.info(f"Enabling MPSGameLift gem")
+    o3de_logger.info("Enabling MPSGameLift gem")
     if (enable_gem.enable_gem_in_project(gem_name="MPSGameLift", project_path=o3de_context.project_path) != 0):
         quit()
 
@@ -78,7 +79,7 @@ if (args.code):
 
     if (process_command(["cmake", "--build", build_folder, "--target", f"{project_name}.ServerLauncher", "AssetProcessor", "AssetBundler", "AssetBundlerBatch", "--config", "profile", "--", "/m"]) != 0):
         quit()
-        
+
     # Build monolithic server launcher build
     monolithic_build_folder = os.path.join(o3de_context.project_path, "build", "windows_mono")
     os.makedirs(monolithic_build_folder, exist_ok=True)
@@ -89,7 +90,7 @@ if (args.code):
         quit()
 
 # Build Assets
-if (args.assets):
+if args.assets:
     # Process assets
     if (process_command(["cmake", "--build", build_folder, "--target", f"{project_name}.Assets", "--config", "profile", "--", "/m"]) != 0):
         quit()
@@ -106,10 +107,10 @@ if (args.assets):
     engine_asset_list_path = os.path.join(asset_list_directory, f"engine_{platform}.assetlist")
 
     generate_asset_list_command = f"{asset_bundler_batch} assetLists --assetListFile {game_asset_list_path} --platform {platform} --allowOverwrites"
-    
+
     # Add all the .seed files found inside <project>/AssetBundling/SeedLists
     seed_file_extension = ".seed"
-    
+
     seed_files = [os.path.join(seed_list_directory, f) for f in os.listdir(seed_list_directory) if f.endswith(seed_file_extension)]
 
     if not seed_files:
@@ -117,7 +118,7 @@ if (args.assets):
         quit()
 
     for file in seed_files:
-        generate_asset_list_command += str(f" --seedListFile ")
+        generate_asset_list_command += " --seedListFile "
         generate_asset_list_command += str(os.path.join(seed_list_directory, file))
 
     if (process_command(generate_asset_list_command.split()) != 0):
